@@ -1,0 +1,15 @@
+# Fichiers temporaires Python
+__pycache__/
+*.py[cod]
+# Environnements virtuels
+env/
+venv/
+.env/
+.venv/
+# Fichiers système
+.DS_Store
+Thumbs.db
+# Fichiers Jupyter et notebooks checkpoints
+.ipynb_checkpoints/
+# Dépendances (si tu n'utilises que requirements.txt)
+*.egg-info/
