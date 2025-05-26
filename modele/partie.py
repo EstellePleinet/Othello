@@ -22,21 +22,29 @@ class Partie:
     
     def get_joueur_courant(self): return self.joueurs[int(self.joueur_courant)]
     
+    def passer_tour(self):
+        self.joueur_courant = not self.joueur_courant
+    
     def get_est_terminee(self):
         return self.est_terminee
     
-    def check_est_terminee(self):
-        coups_possibles_noirs = self._coupsPossibles(Couleur.NOIR)
-        coups_possibles_blancs = self._coupsPossibles(Couleur.BLANC)
-        
-        self.est_terminee = not (coups_possibles_noirs or coups_possibles_blancs)
-        
-        if (self.est_terminee):
-            # On détermine le gagnant
+    def update_gagnant(self):
+        """Met à jour le gagnant de la partie si elle est terminée."""
+        if self.est_terminee:
             pions_noirs = self._get_all_pions_of_color(Couleur.NOIR)
             pions_blancs = self._get_all_pions_of_color(Couleur.BLANC)
             if len(pions_noirs) > len(pions_blancs):
                 self.gagnant = self.joueurs[0]
+            elif len(pions_blancs) > len(pions_noirs):
+                self.gagnant = self.joueurs[1]
+            else:
+                self.gagnant = None
+    
+    def update_est_terminee(self):
+        coups_possibles_noirs = self.coupsPossibles(Couleur.NOIR)
+        coups_possibles_blancs = self.coupsPossibles(Couleur.BLANC)
+        
+        self.est_terminee = self.othellier.est_rempli() or (not (coups_possibles_noirs or coups_possibles_blancs))
         
     def _get_all_pions_of_color(self, couleur : Couleur):
         pions = []
@@ -47,7 +55,7 @@ class Partie:
                         pions.append(pion)
         return pions
     
-    def _coupsPossibles(self, couleur : Couleur):
+    def coupsPossibles(self, couleur : Couleur):
         """Calculs les coups possibles pour une couleur donnée."""
         coups_possibles = []
         # Liste des pions de couleur opposée à côté desquels il est possible de jouer :
@@ -95,14 +103,11 @@ class Partie:
             if voisin is not None:
                 self.othellier.mettre_a_jour_voisins_autour(voisin)
     
-    def joue_coup(self, pos: str, joueur : Joueur):
+    def joue_coup(self, pos: str, joueur : Joueur, coups_possibles):
         pos = pos.upper().strip()
         if (self.othellier.est_position_valide_str(pos)):
             position = Position(label=pos)
             pion = Pion(joueur.get_couleur(), position)
-            coups_possibles = self._coupsPossibles(pion.get_couleur())
-            if not coups_possibles:
-                return False
             coups_compatibles = self._coupCompatibles(coups_possibles, pion)
             if not coups_compatibles:
                 raise ValueError("Aucun coup n'est possible à cette position.")
@@ -110,10 +115,6 @@ class Partie:
             self.othellier.set_case(pion)
             self._retourne_pions(coups_compatibles, pion, joueur)
             self._update_voisins(pion)
-            # Met à jour l'état de la partie
-            self.check_est_terminee()
-            #Mise à jour du joueur actuel qui joue !
-            self.joueur_courant = not self.joueur_courant
             return True
         else:
             raise ValueError("La position n'est pas valide. Veuillez rentrer une case type 'A2'")
