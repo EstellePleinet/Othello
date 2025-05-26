@@ -47,13 +47,13 @@ class Position:
         return Position(self._x + dx, self._y + dy)
     
     def to_position(self) -> bool :
-        colonnes = 'ABCDEFGIJKLMNOPQRSTUVWXYZ'
+        colonnes = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         col_letter = self.get_label()[0].upper()
         self._y = colonnes.index(col_letter)
         self._x = int(self.get_label()[1]) - 1
 
     def to_string(self) :
-        colonnes = 'ABCDEFGIJKLMNOPQRSTUVWXYZ'
+        colonnes = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         lettre = str(colonnes[self.get_y()])
         nombre = str(self.get_x() + 1)
         self._label = lettre + nombre        
