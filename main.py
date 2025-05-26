@@ -1,8 +1,10 @@
-from jeu import *
+from modele import *
+from controleur.controleur import Controleur
 
 def main():
-    plateau = Othellier()
-    print(plateau)
+    controleur =  Controleur()
+    controleur.boucle_jeu()
+    
 
 if __name__ == "__main__":
-    main()
+    main() 
