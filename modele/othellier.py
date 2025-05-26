@@ -21,9 +21,8 @@ class Othellier :
         return self._grille
     
     def case_exist(self, pos: Position):
-        if pos.get_x() > self.taille or pos.get_y() > self.taille :
-            return False
-        return True
+        x, y = pos.get_x(), pos.get_y()
+        return 0 <= x < self.taille and 0 <= y < self.taille
     
     def get_case(self, pos: str):
         position = Position(label=pos)
