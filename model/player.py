@@ -10,15 +10,15 @@ class Player:
         self._is_human = is_human
         
     @property   
-    def name(self): 
+    def name(self) -> str: 
         return self._name
     
     @property
-    def color(self): 
+    def color(self) -> Color: 
         return self._color
     
     @property
-    def is_human(self):
+    def is_human(self) -> bool:
         return self._is_human
         
     def __str__(self):

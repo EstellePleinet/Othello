@@ -3,6 +3,7 @@ from typing import Optional
 from .pawn import Pawn, Color
 from .position import Position, Direction
 
+"""A class representing a move in the Othello game."""
 class Move:
     def __init__(self, position : Position, pawn : Pawn, direction: Direction):
         if not isinstance(position, Position):
@@ -52,6 +53,7 @@ class Move:
             raise ValueError("case must be a Case instance")
         self._to_flip.append(case)
 
+""" A class representing a case on the Othello board, which can contain a pawn and has neighbors in different directions. """
 class Case:
     
     def __init__(self, position: Position):
@@ -98,6 +100,7 @@ class Case:
     def __str__(self) -> str:
         return str(self._pawn) if self._pawn else "·"
 
+""" A class representing the Othello board, which contains a grid of cases and methods to manage the game state. """
 class Board:
     
     def __init__(self, size=8, starting_pawns=True):
@@ -119,6 +122,7 @@ class Board:
         return self._grid
 
     def _init_neighbors(self):
+        """Initializes the neighbors for each case in the grid."""
         for row in self._grid:
             for case in row:
                 for direction in Direction:
@@ -128,6 +132,7 @@ class Board:
                         case.set_neighbor(direction, neighbor_case)
 
     def _init_starting_pawns(self):
+        """Initializes the starting pawns in the center of the board."""
         mid = self._size // 2
         layout = [
             (mid - 1, mid - 1, Color.BLACK),
@@ -148,6 +153,7 @@ class Board:
         return self._grid[position.row][position.col]
 
     def cases_with_pawn_color(self, color: Color) -> list[Case]:
+        """Returns all cases that contain a pawn of the specified color."""
         cases = []
         for row in self.grid:
             for case in row:
@@ -156,16 +162,16 @@ class Board:
         return cases
     
     def compute_move(self, position: Position, pawn: Pawn, direction: Direction) -> Move:
-
+        """Computes a move based on the position, pawn, and direction."""
+        
         move = Move(position, pawn, direction)
         case_to_compare =  self.case_at(position).get_neighbor(direction)
         
-        while case_to_compare.pawn is not None:
+        while case_to_compare is not None and case_to_compare.pawn is not None:
             if case_to_compare.pawn.color != pawn.color :
                 move.add_to_flip(case_to_compare)
             elif case_to_compare.pawn.color == pawn.color :
-                move.is_valid = len(move.to_flip) > 0
-                move.is_valid = True
+                move.is_valid = bool(move.to_flip)
                 return move
             
             case_to_compare = case_to_compare.get_neighbor(direction)
