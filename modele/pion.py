@@ -2,8 +2,8 @@ from enum import Enum
 from .position import Direction, Position
 
 class Couleur(Enum):
-    BLANC = 'b'
-    NOIR = 'n'
+    NOIR = '◯'
+    BLANC = '◉'
     
     def opposee(self):
         if self == Couleur.BLANC:
