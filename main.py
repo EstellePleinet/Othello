@@ -1,9 +1,8 @@
-from modele import *
-from controleur.controleur import Controleur
+from controller.controller import Controller
 
 def main():
-    controleur =  Controleur()
-    controleur.boucle_jeu()
+    controller = Controller()
+    controller.play_game()
     
 
 if __name__ == "__main__":
