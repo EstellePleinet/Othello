@@ -5,7 +5,7 @@ class Color(Enum):
     BLACK = '◯'
     WHITE = '◉'
     
-    def opposite(self):
+    def opposite(self) -> 'Color':
         return Color.BLACK if self == Color.WHITE else Color.WHITE
     
     def __str__(self):
@@ -16,7 +16,7 @@ class Pawn:
         self._color = color 
 
     @property
-    def color(self):
+    def color(self) -> Color:
         return self._color
 
     def flip(self):
