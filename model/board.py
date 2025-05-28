@@ -1,5 +1,5 @@
 import string
-from typing import Optional
+from typing import Generator, Optional
 from .pawn import Pawn, Color
 from .position import Position, Direction
 
@@ -179,11 +179,19 @@ class Board:
         move.clear_flip()
         return move
     
+    def compute_all_moves_from_position(self, position: Position, color: Color) -> list[Move]:
+        res = []
+        for direction in Direction:
+            move = self.compute_move(position, Pawn(color), direction)
+            if move.is_valid:
+                res.append(move)
+        return res
+    
     def all_valid_moves(self, color: Color) -> list[Move]:
         """Returns all valid moves for the given color."""
         return list(self.valid_moves_iterator(color))
     
-    def valid_moves_iterator(self, color: Color) -> list[Move]:
+    def valid_moves_iterator(self, color: Color) -> Generator[Move, None, None]:
         """Generator that yields valid moves for the given color."""
         for enemy_case in self.cases_with_pawn_color(color.opposite()):
             for direction in enemy_case.get_empty_neighbors_directions(): 

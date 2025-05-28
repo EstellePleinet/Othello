@@ -56,6 +56,22 @@ class Game:
         possible_moves_black = self.board.valid_moves_iterator(Color.BLACK)
         possible_moves_white = self.board.valid_moves_iterator(Color.WHITE)
         self._is_over = self.board.is_full() or (not (possible_moves_black or possible_moves_white))
+        
+    def game_is_over(self) -> bool:
+        self.update_is_over()
+        return self._is_over
+    
+    def game_evaluate(self, color: Color) -> int:
+        """Evaluates the game state for the given color."""
+        
+        black_pawns = len(self.board.cases_with_pawn_color(Color.BLACK))
+        white_pawns = len(self.board.cases_with_pawn_color(Color.WHITE))
+        
+        if color == Color.BLACK:
+            return black_pawns - white_pawns
+        elif color == Color.WHITE:
+            return white_pawns - black_pawns
+
 
     def validate_move(self, pos_str: str, player: Player) -> tuple[Position, Color, list[Move]]:
         """Validates a move and returns data needed to play it, or raises ValueError."""

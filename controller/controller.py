@@ -1,3 +1,5 @@
+import copy
+from AI.minmax import Minmax
 from model import Player, Game, Move, Color
 from view.view import View
 # Othello/controller/controller.py
@@ -10,13 +12,26 @@ class Controller:
     def __init__(self):
         self.game = None
         self.view = View()
+        self.difficulty = 3
 
     def init_game(self):
-        name1 = self.view.ask_player_name(1)
-        name2 = self.view.ask_player_name(2)
+        
+        bot = self.view.ask_bot()
+        if bot:
+            self.difficulty = int(self.view.ask_difficulty())
+            color = self.view.ask_color()
+            if color in ["black", "b", "noir", "n"]:
+                player1 = Player(self.view.ask_player_name(1), color=Color.BLACK, is_human=True)
+                player2 = Player("Bot", color=Color.WHITE, is_human=False)
+            else:
+                player1 = Player("Bot", color=Color.BLACK, is_human=False)
+                player2 = Player(self.view.ask_player_name(2), color=Color.WHITE, is_human=True)
+        else:
+            name1 = self.view.ask_player_name(1)
+            name2 = self.view.ask_player_name(2)
 
-        player1 = Player(name1, color=Color.BLACK, is_human=True)
-        player2 = Player(name2, color=Color.WHITE, is_human=True)
+            player1 = Player(name1, color=Color.BLACK, is_human=True)
+            player2 = Player(name2, color=Color.WHITE, is_human=True)
 
         self.game = Game(player1, player2)
 
@@ -62,8 +77,26 @@ class Controller:
                 self.view.display_error(str(e))
                 
 
-    def play_ai_turn(self, player: Player, possible_moves: list[Move]):
-        move = possible_moves[0]  # À remplacer plus tard par un algo
-        self.view.display_message(f"{player.name} plays at {move.starting_position.to_label()}")
-        self.game.play_turn(move.starting_position.to_label(), player) 
-            
+
+    def play_ai_turn(self, player: Player):
+        self.view.display_message(f"{player.name} is thinking...")
+
+        # Deepcopy temporaire
+        game_copy = copy.deepcopy(self.game)
+
+        ai = Minmax(game=game_copy, depth=self.difficulty, color=player.color)
+        move = ai.best_move()
+
+        if not move:
+            self.view.display_message(f"{player.name} has no valid moves.")
+            self.game.switch_turn()
+            self.game.update_is_over()
+            return
+
+        label = move.starting_position.label
+        self.view.display_message(f"{player.name} plays at {label}")
+
+        try:
+            self.game.play_turn(label, player)
+        except ValueError as e:
+            self.view.display_error(f"Erreur IA : {e}")   
