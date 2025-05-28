@@ -179,22 +179,19 @@ class Board:
         move.clear_flip()
         return move
     
-    def possible_moves(self, color: Color) -> list[Move]:
+    def all_valid_moves(self, color: Color) -> list[Move]:
         """Returns all valid moves for the given color."""
-        
-        possible_moves = []
-        enemy_cases = self.cases_with_pawn_color(color.opposite())
-
-        for enemy_case in enemy_cases:
-            directions = enemy_case.get_empty_neighbors_directions() 
-            if directions:
-                for direction in directions:
-                    candidate_position = enemy_case.position.next_position(direction)
-                    if self.is_valid_position(candidate_position):
-                        move = self.compute_move(candidate_position, Pawn(color), direction.get_opposite_direction())
-                        if move.is_valid:
-                            possible_moves.append(move)
-        return possible_moves
+        return list(self.valid_moves_iterator(color))
+    
+    def valid_moves_iterator(self, color: Color) -> list[Move]:
+        """Generator that yields valid moves for the given color."""
+        for enemy_case in self.cases_with_pawn_color(color.opposite()):
+            for direction in enemy_case.get_empty_neighbors_directions(): 
+                candidate_position = enemy_case.position.next_position(direction)
+                if self.is_valid_position(candidate_position):
+                    move = self.compute_move(candidate_position, Pawn(color), direction.get_opposite_direction())
+                    if move.is_valid:
+                        yield move
     
     def filter_compatible_moves(self, possible_moves: list[Move], position: Position, color: Color) -> list[Move]:
         """Filters moves to keep only those that match the pawn's position."""

@@ -26,9 +26,8 @@ class Controller:
 
         while not self.game.is_over:
             player = self.game.current_player
-            possible_moves = self.game.board.possible_moves(player.color)
 
-            if not possible_moves:
+            if not any(self.game.board.valid_moves_iterator(player.color)):
                 self.view.display_message(f"No valid moves for {player.name}. Turn skipped.")
                 self.game.switch_turn()
                 self.game.update_is_over()
@@ -39,10 +38,10 @@ class Controller:
             if player.is_human:
                 self.ask_and_play_turn(player)
             else:
-                self.play_ai_turn(player, possible_moves)
+                self.play_ai_turn(player)
 
         self.view.display_board(self.game.board)
-        self.view.display_message("This concludes the match ! Let's see who won...")
+        self.view.display_message("This concludes the match! Let's see who won...")
 
         self.game.update_winner()
         winner = self.game.winner
@@ -50,6 +49,7 @@ class Controller:
             self.view.display_message(f"The winner is {winner.name}.")
         else:
             self.view.display_message("Draw!")
+
 
 
     def ask_and_play_turn(self, player: Player):

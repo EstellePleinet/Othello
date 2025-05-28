@@ -53,47 +53,52 @@ class Game:
                 self._winner = None
     
     def update_is_over(self):
-        possible_moves_black = self.board.possible_moves(Color.BLACK)
-        possible_moves_white = self.board.possible_moves(Color.WHITE)
+        possible_moves_black = self.board.valid_moves_iterator(Color.BLACK)
+        possible_moves_white = self.board.valid_moves_iterator(Color.WHITE)
         self._is_over = self.board.is_full() or (not (possible_moves_black or possible_moves_white))
 
-    def play_turn(self, pos_str: str, player: Player) -> bool:
-        """Plays a turn for the given player at the specified position."""
+    def validate_move(self, pos_str: str, player: Player) -> tuple[Position, Color, list[Move]]:
+        """Validates a move and returns data needed to play it, or raises ValueError."""
         if self.is_over:
             raise ValueError("The game is over. No more moves can be played.")
         
         if player != self.current_player:
             raise ValueError("It's not your turn.")
-
+        
         if not Position.is_valid_label_format(pos_str):
             raise ValueError("Invalid position format. Use a letter followed by a number (e.g., A1, B2).")
         
         position = Position(label=pos_str.strip().upper())
-        if self.board.is_valid_position(position) is False:
+
+        if not self.board.is_valid_position(position):
             raise ValueError("The position is out of bounds of the board.")
+        
         if self.board.case_at(position).pawn is not None:
             raise ValueError("The position is already occupied by a pawn.")
-        
+
         color = player.color
-        possible_moves = self.board.possible_moves(color)
-        if not possible_moves:
+
+        # Vérifie qu’il existe des coups possibles
+        if not any(self.board.valid_moves_iterator(color)):
             raise ValueError(f"No valid moves available for {player.name}.")
 
-        return self.play_move(position, color, possible_moves)
-   
-    def play_move(self, pos: Position, color: Color, possible_moves: list[Move]) -> bool:
-        """Plays a move at the specified position with the given color."""
-        if not self.board.is_valid_position(pos):
-            raise ValueError("Invalid position.")
+        # Récupère uniquement les coups liés à cette position
+        compatible_moves = [m for m in self.board.valid_moves_iterator(color) if m.starting_position == position]
 
-        if self.board.case_at(pos).pawn is not None:
-            raise ValueError("The position is already occupied.")
-
-        compatible_moves = [m for m in possible_moves if m.starting_position == pos]
-        
         if not compatible_moves:
             raise ValueError("No valid move at this position.")
 
+        return position, color, compatible_moves
+
+    
+    def play_turn(self, pos_str: str, player: Player) -> bool:
+        """Plays a turn for the given player at the specified position."""
+        position, color, compatible_moves = self.validate_move(pos_str, player)
+        return self.play_move(position, color, compatible_moves)
+
+   
+    def play_move(self, pos: Position, color: Color, compatible_moves: list[Move]) -> bool:
+        """Plays a move at the specified position with the given color and compatible flips."""
         self.board.case_at(pos).pawn = Pawn(color)
         self.board.flip_pawns(compatible_moves)
 
@@ -104,4 +109,5 @@ class Game:
             self.update_winner()
 
         return True
+
 
