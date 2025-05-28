@@ -88,13 +88,13 @@ class Controller:
         move = ai.best_move()
 
         if not move:
-            self.view.display_message(f"{player.name} has no valid moves.")
+            self.view.display_message(f"{player} has no valid moves.")
             self.game.switch_turn()
             self.game.update_is_over()
             return
 
         label = move.starting_position.label
-        self.view.display_message(f"{player.name} plays at {label}")
+        self.view.display_message(f"{player} plays at {label}")
 
         try:
             self.game.play_turn(label, player)
