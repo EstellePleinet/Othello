@@ -59,7 +59,8 @@ class Minmax:
             # evalate the score of the move using minimax
             eval_score = self.minimax(game_copy, depth - 1, not maximizing_player)
 
-            
+            # Best evaluation when ennemy is min of evaluate(color of bot)
+            # Best evaluation when bot is max of evaluate(color of bot)
             if maximizing_player:
                 best_eval = max(best_eval, eval_score)
             else:
